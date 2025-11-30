@@ -1,14 +1,10 @@
-/*******************************************************************************
+﻿/*******************************************************************************
 * AI-Powered Faculty Stress Detector - Expert System Component
-* Visual Prolog Knowledge Base and Rules for Wellness Recommendations
+* Visual Prolog Implementation
 *******************************************************************************/
 
 implement main
-    open core, stdio
-
-constants
-    className = "faculty_wellness/faculty_wellness".
-    classVersion = "".
+    open core, stdio, string
 
 clauses
     run() :-
@@ -20,27 +16,51 @@ clauses
         readStressLevel(),
         stdio::write("\n============================================================\n"),
         stdio::write("Thank you for using the Faculty Wellness Expert System!\n"),
-        stdio::write("============================================================\n").
+        stdio::write("============================================================\n"),
+        stdio::write("\nPress Enter to exit...\n"),
+        _ = stdio::readLine().
 
-    % Read stress level from output file
+    % Read stress level from file
     readStressLevel() :-
-        FileName = "integration\\stress_output.txt",
-        file::openFile(FileName, file::read, Stream),
-        file::readString(Stream, Line),
-        file::closeFile(Stream),
-        parseStressLevel(Line, StressLevel),
+        % Try multiple possible file paths (check local directory first)
+        (tryReadFile("stress_output.txt", StressLevel);
+         tryReadFile("..\\..\\..\\integration\\stress_output.txt", StressLevel);
+         tryReadFile("..\\..\\integration\\stress_output.txt", StressLevel);
+         tryReadFile("integration\\stress_output.txt", StressLevel)),
         !,
+        stdio::write("Reading stress level from ML component output...\n"),
         stdio::write("Stress Level Detected: ", StressLevel, "\n\n"),
         provideRecommendations(StressLevel).
     
     readStressLevel() :-
-        stdio::write("Error: Could not read stress_output.txt file.\n"),
-        stdio::write("Please run the Python ML component first.\n").
+        % Fallback if file not found
+        stdio::write("Warning: Could not read stress_output.txt\n"),
+        stdio::write("Using default: Medium stress\n\n"),
+        provideRecommendations("Medium").
+    
+    % Try to read file from given path
+    tryReadFile(FilePath, StressLevel) :-
+        fileReader::readLineFromFile(FilePath, Line),
+        stdio::write("DEBUG: Read line from file: [", Line, "]\n"),
+        parseStressLevel(Line, StressLevel).
 
     % Parse stress level from file
     parseStressLevel(Line, StressLevel) :-
-        string::frontToken(Line, "STRESS_LEVEL=", Rest),
-        string::frontToken(Rest, StressLevel, _),
+        % Check for Low first (most specific)
+        string::hasPrefix(Line, "STRESS_LEVEL=Low"),
+        StressLevel = "Low",
+        !.
+
+    parseStressLevel(Line, StressLevel) :-
+        % Check for Medium
+        string::hasPrefix(Line, "STRESS_LEVEL=Medium"),
+        StressLevel = "Medium",
+        !.
+
+    parseStressLevel(Line, StressLevel) :-
+        % Check for High
+        string::hasPrefix(Line, "STRESS_LEVEL=High"),
+        StressLevel = "High",
         !.
 
     parseStressLevel(_, "Unknown").
@@ -75,7 +95,7 @@ clauses
         fact(11, "Time management strategies can mitigate stress"),
         fact(12, "Institutional support is crucial for faculty well-being"),
         fail.
-    
+
     displayFacts().
 
     % Knowledge Base Facts
@@ -238,5 +258,4 @@ clauses
 end implement main
 
 goal
-    mainExe::run(main::run).
-
+    console::runUtf8(main::run).

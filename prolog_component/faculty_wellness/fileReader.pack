@@ -1,0 +1,12 @@
+% own pack
+#include @"fileReader.ph"
+
+% privately used packages
+#include @"pfc\fileSystem\fileSystem.ph"
+#include @"pfc\stream\stream.ph"
+#include @"pfc\core.ph"
+#include @"pfc\string\string.ph"
+
+% implementations
+#include @"fileReader.pro"
+
