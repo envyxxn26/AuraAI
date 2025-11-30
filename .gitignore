@@ -49,6 +49,15 @@ ml_component/stress_model.pkl
 *.obj
 *.pdb
 *.log
+*.env
+*.prjgrd
+*.bro
+*.deb
+*.scope
+
+# Backups
+*_backup.xlsx
+dataset_backup.xlsx
 
 
 
