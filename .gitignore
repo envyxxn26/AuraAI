@@ -43,6 +43,7 @@ Thumbs.db
 # Project specific
 integration/stress_output.txt
 ml_component/stress_model.pkl
+integration/batch_analysis_results.csv
 
 # Visual Prolog
 *.exe
